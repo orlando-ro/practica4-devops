@@ -1,0 +1,31 @@
+name: CI Hola Mundo y Notificación ntfy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clonar el repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Ejecutar Hola Mundo
+        run: node app.js
+
+      - name: Enviar notificación a ntfy
+        if: success()
+        run: |
+          curl -H "Title: Despliegue Exitoso en Main" \
+               -H "Priority: high" \
+               -H "Tags: white_check_mark,rocket" \
+               -d "Se ha subido nuevo código a la rama main por el commit: '${{ github.event.head_commit.message }}' ejecutado por ${{ github.actor }}." \
+               https://ntfy.sh/devops-itla
